@@ -1,0 +1,17 @@
+{
+  "id": "ryver",
+  "name": "Ryver",
+  "version": "1.0.0",
+  "description": "Ryver",
+  "main": "index.js",
+  "author": "Filippo Gangi Dino <filippo.gangidino@welaika.com>",
+  "license": "MIT",
+  "config": {
+    "serviceURL": "https://{teamId}.ryver.com",
+    "hasNotificationSound": true,
+    "hasDirectMessages": true,
+    "hasIndirectMessages": true,
+    "hasTeamId": true,
+    "urlInputSuffix": ".ryver.com"
+  }
+}
