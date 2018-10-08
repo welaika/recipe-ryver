@@ -1,54 +1,20 @@
-import { ipcRenderer } from 'electron';
-import path from 'path';
-
-const getTeamIcon = function getTeamIcon(count = 0) {
-  let countTeamIconCheck = count;
-  let bgUrl = null;
-
-  const teamMenu = document.querySelector('#team_menu');
-  if (teamMenu) {
-    teamMenu.click();
-
-    const icon = document.querySelector('.team_icon');
-    if (icon) {
-      bgUrl = window.getComputedStyle(icon, null).getPropertyValue('background-image');
-      bgUrl = /^url\((['"]?)(.*)\1\)$/.exec(bgUrl);
-      bgUrl = bgUrl ? bgUrl[2] : '';
-    }
-
-    setTimeout(() => {
-      document.querySelector('.team_menu').remove();
-      document.querySelector('#msg_input .ql-editor').focus();
-    }, 10);
-  }
-
-  countTeamIconCheck += 1;
-
-  if (bgUrl) {
-    ipcRenderer.sendToHost('avatar', bgUrl);
-  } else if (countTeamIconCheck <= 5) {
-    setTimeout(() => {
-      getTeamIcon(countTeamIconCheck + 1);
-    }, 2000);
-  }
-};
-
-const SELECTOR_CHANNELS_UNREAD = '.p-channel_sidebar__channel--unread:not(.p-channel_sidebar__channel--muted)';
+const path = require('path');
 
 module.exports = (Franz) => {
-  const getMessages = () => {
-    const directMessages = document.querySelectorAll(`${SELECTOR_CHANNELS_UNREAD} .p-channel_sidebar__badge`).length;
-    const allMessages = document.querySelectorAll(SELECTOR_CHANNELS_UNREAD).length - directMessages;
+  const getMessages = function getMessages() {
+    let direct = document.querySelectorAll('.simplebar-content .scene-space-tab-button--has-new-content:not(.scene__teams):not(.scene__users):not(.scene__notifications) .scene-space-tab-button__badge').length;
+    let notification_messages = document.querySelectorAll('.simplebar-content .scene-space-tab-button--has-new-content.scene__notifications .scene-space-tab-button__badge .scene-space-tab-button__badge-count');
+    let notifications = 0;
+    if (notification_messages.length > 0) {
+      notifications = Number(notification_messages[0].innerHTML);
+    }
 
-    // set Franz badge
-    Franz.setBadge(directMessages, allMessages);
-  };
-  Franz.loop(getMessages);
-
-  setTimeout(() => {
-    getTeamIcon();
-  }, 4000);
+    let count = direct + notifications;
+    Franz.setBadge(count);
+  }
 
   // inject franz.css stylesheet
   Franz.injectCSS(path.join(__dirname, 'service.css'));
+
+  Franz.loop(getMessages);
 };
